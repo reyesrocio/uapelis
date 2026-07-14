@@ -40,10 +40,17 @@ export default function Header({
 }) {
   const [query, setQuery] = useState('');
   const [showAuth, setShowAuth] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, username, signOut } = useAuth();
 
   function submitSearch() {
     onSearch(query.trim());
+    setMobileMenuOpen(false);
+  }
+
+  function handleSelect(key) {
+    onSelectSection(key);
+    setMobileMenuOpen(false);
   }
 
   return (
@@ -56,18 +63,39 @@ export default function Header({
             <button
               key={s.key}
               className={`nav-btn${activeSection === s.key ? ' active' : ''}`}
-              onClick={() => onSelectSection(s.key)}
+              onClick={() => handleSelect(s.key)}
             >
               {s.label}
             </button>
           ))}
           <button
             className={`nav-btn${activeSection === 'reviews' ? ' active' : ''}`}
-            onClick={() => onSelectSection('reviews')}
+            onClick={() => handleSelect('reviews')}
           >
             Reseñas
           </button>
         </nav>
+
+        <button
+          className="hamburger-btn"
+          aria-label="Abrir menú"
+          onClick={() => setMobileMenuOpen((v) => !v)}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            {mobileMenuOpen ? (
+              <>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </>
+            ) : (
+              <>
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
+        </button>
 
         <div className="search-wrap">
           <input
@@ -104,7 +132,7 @@ export default function Header({
           </button>
 
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 10, flexShrink: 0 }}>
+            <div className="header-user-chip" style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 10, flexShrink: 0 }}>
               <div
                 title={username}
                 style={{
@@ -127,6 +155,7 @@ export default function Header({
               </div>
               <button
                 onClick={signOut}
+                className="header-signout-btn"
                 style={{
                   background: 'none',
                   border: '1px solid var(--border)',
@@ -145,6 +174,7 @@ export default function Header({
           ) : (
             <button
               onClick={() => setShowAuth(true)}
+              className="header-login-btn"
               style={{
                 background: 'none',
                 border: '1px solid rgba(232,130,42,0.4)',
@@ -164,6 +194,50 @@ export default function Header({
           )}
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div className="mobile-menu">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.key}
+              className={`mobile-menu-btn${activeSection === s.key ? ' active' : ''}`}
+              onClick={() => handleSelect(s.key)}
+            >
+              {s.label}
+            </button>
+          ))}
+          <button
+            className={`mobile-menu-btn${activeSection === 'reviews' ? ' active' : ''}`}
+            onClick={() => handleSelect('reviews')}
+          >
+            Reseñas
+          </button>
+
+          <div className="mobile-menu-divider" />
+
+          {user ? (
+            <button
+              className="mobile-menu-btn"
+              onClick={() => {
+                signOut();
+                setMobileMenuOpen(false);
+              }}
+            >
+              Cerrar sesión ({username})
+            </button>
+          ) : (
+            <button
+              className="mobile-menu-btn accent"
+              onClick={() => {
+                setShowAuth(true);
+                setMobileMenuOpen(false);
+              }}
+            >
+              Iniciar sesión
+            </button>
+          )}
+        </div>
+      )}
 
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
     </header>

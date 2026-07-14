@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function AuthModal({ isOpen, onClose }) {
@@ -43,7 +44,7 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -169,6 +170,7 @@ export default function AuthModal({ isOpen, onClose }) {
           )}
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
